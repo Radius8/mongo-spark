@@ -89,7 +89,8 @@ object PartitionerHelper {
    * @return the locations
    */
   def locations(connector: MongoConnector): Seq[String] =
-    connector.withMongoClientDo(mongoClient => mongoClient.getAllAddress.asScala.map(_.getHost).distinct)
+
+    connector.withMongoClientDo(mongoClient => mongoClient.getClusterDescription.getClusterSettings.getHosts.asScala.map(_.getHost).distinct)
 
   /**
    * Runs the `collStats` command and returns the results

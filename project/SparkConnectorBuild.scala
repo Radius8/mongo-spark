@@ -91,7 +91,7 @@ object SparkConnectorBuild extends Build {
   val checkAlias = addCommandAlias("check", ";clean;scalastyle;coverage;test;coverageAggregate;coverageReport")
 
   lazy val connector = Project(
-    id = "mongo-spark-connector",
+    id = "mongo-spark-connector-r8",
     base = file(".")
   ).settings(buildSettings)
     .settings(buildInfoSettings)

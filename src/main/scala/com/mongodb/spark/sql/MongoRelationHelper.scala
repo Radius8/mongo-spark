@@ -23,6 +23,7 @@ import scala.collection.JavaConverters._
 import org.apache.spark.sql.sources._
 
 import org.bson.conversions.Bson
+import org.bson.BsonInt32
 import com.mongodb.client.model.{Aggregates, Filters, Projections}
 
 private[spark] object MongoRelationHelper {
@@ -60,7 +61,7 @@ private[spark] object MongoRelationHelper {
   private def createProjection(requiredColumns: Array[String]): Bson = {
     requiredColumns.contains("_id") match {
       case true  => Projections.include(requiredColumns: _*)
-      case false => Filters.and(Projections.include(requiredColumns: _*), Projections.excludeId())
+      case false => Projections.include(requiredColumns: _*).toBsonDocument().append("_id", new BsonInt32(0))
     }
   }
 

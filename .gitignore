@@ -42,3 +42,4 @@ docs/landing/public
 docs/hugo*
 
 c-conn
+/bin/

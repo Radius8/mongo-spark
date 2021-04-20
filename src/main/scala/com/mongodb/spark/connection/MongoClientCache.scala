@@ -158,7 +158,8 @@ private[spark] final class MongoClientCache(keepAlive: Duration) extends Logging
 
   private def logClient(mongoClient: MongoClient, closing: Boolean = false): Unit = {
     val status = if (closing) "Closing" else "Creating"
-    logInfo(s"""$status MongoClient: ${mongoClient.getServerAddressList.asScala.map(_.toString).mkString("[", ",", "]")}""")
+
+    logInfo(s"""$status MongoClient: ${mongoClient.getClusterDescription.getClusterSettings.getHosts.asScala.map(_.toString).mkString("[", ",", "]")}""")
   }
 
 }

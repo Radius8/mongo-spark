@@ -19,6 +19,7 @@ package tour;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.spark.MongoConnector;
 import com.mongodb.spark.MongoSpark;
 import com.mongodb.spark.config.ReadConfig;
@@ -35,15 +36,24 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.MongoCursor;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public final class JavaIntroduction {
 
@@ -54,6 +64,8 @@ public final class JavaIntroduction {
      * @throws InterruptedException if a latch is interrupted
      */
     public static void main(final String[] args) throws InterruptedException {
+//    		testJava();
+    	
         JavaSparkContext jsc = createJavaSparkContext(args);
 
         // Create a RDD
@@ -144,7 +156,8 @@ public final class JavaIntroduction {
         // SQL
         explicitDF.registerTempTable("characters");
         Dataset<Row> centenarians = sparkSession.sql("SELECT name, age FROM characters WHERE age >= 100");
-
+//        centenarians.show();
+        
         // Saving DataFrame
         MongoSpark.write(centenarians).option("collection", "hundredClub").save();
         MongoSpark.load(sparkSession, ReadConfig.create(sparkSession).withOption("collection", "hundredClub"), Character.class).show();
@@ -202,5 +215,25 @@ public final class JavaIntroduction {
     private static void dropDatabase(final String connectionString) {
         MongoClientURI uri = new MongoClientURI(connectionString);
         new MongoClient(uri).dropDatabase(uri.getDatabase());
+    }
+    
+    @SuppressWarnings("unchecked")
+	static void testJava() {
+    		System.out.println("Start");
+    		MongoClientURI uri = new MongoClientURI("mongodb://localhost/test");
+    		MongoClient mc = new MongoClient(uri);
+    		MongoDatabase db = mc.getDatabase("test");
+    		MongoCollection coll = db.getCollection("coll");
+    		List pipelines = new ArrayList();
+    		String requiredColumns[] = new String[] {"name","age"};
+    		Bson doc = Aggregates.project(Filters.and(Projections.include(requiredColumns), Projections.excludeId()));
+    		pipelines.add(doc);
+    		MongoCursor curs = coll.aggregate(pipelines).iterator();		
+    		while(curs.hasNext()) {
+    			Object obj = curs.next();
+    			System.out.println(obj);
+    		}
+    		System.out.println("Finish");
+    		System.exit(0);
     }
 }

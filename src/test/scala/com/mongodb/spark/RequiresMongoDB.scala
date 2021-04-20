@@ -58,11 +58,11 @@ trait RequiresMongoDB extends FlatSpec with Matchers with BeforeAndAfterAll with
 
   lazy val collection: MongoCollection[Document] = database.getCollection(readConfig.collectionName)
 
-  lazy val isStandalone: Boolean = mongoClient.cluster.getDescription.getType == STANDALONE
+  lazy val isStandalone: Boolean = mongoClient.getClusterDescription.getType == STANDALONE
 
-  lazy val isReplicaSet: Boolean = mongoClient.cluster.getDescription.getType == REPLICA_SET
+  lazy val isReplicaSet: Boolean = mongoClient.getClusterDescription.getType == REPLICA_SET
 
-  lazy val isSharded: Boolean = mongoClient.cluster.getDescription.getType == SHARDED
+  lazy val isSharded: Boolean = mongoClient.getClusterDescription.getType == SHARDED
 
   val serverVersionMap: mutable.Map[String, Boolean] = mutable.Map.empty[String, Boolean]
   def serverAtLeast(versions: Int*): Boolean = {
